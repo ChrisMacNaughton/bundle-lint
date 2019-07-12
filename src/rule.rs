@@ -46,7 +46,7 @@ applications:
             config_name: "use-cool-thing".to_string(),
             config_value: "True".to_string(),
             requires: HashMap::new(),
-            forbids: forbids,
+            forbids,
         };
         let verification = rule.verify(&bundle);
 
@@ -72,7 +72,7 @@ applications:
             config_name: "use-cool-thing".to_string(),
             config_value: "True".to_string(),
             requires: HashMap::new(),
-            forbids: forbids,
+            forbids,
         };
         let verification = rule.verify(&bundle);
 
@@ -98,7 +98,7 @@ applications:
             config_name: "use-cool-thing".to_string(),
             config_value: "True".to_string(),
             requires: HashMap::new(),
-            forbids: forbids,
+            forbids,
         };
         let verification = rule.verify(&bundle);
 
@@ -123,7 +123,7 @@ applications:
             charm_name: "test-thing".to_string(),
             config_name: "use-cool-thing".to_string(),
             config_value: "True".to_string(),
-            requires: requires,
+            requires,
             forbids: HashMap::new(),
         };
         let verification = rule.verify(&bundle);
@@ -193,18 +193,15 @@ impl Rule {
         for (application, config) in &self.requires {
             if let Some(other_app) = bundle.application(application) {
                 if let Some(value) = other_app.option(&config.name) {
-                    match config.value {
-                        Some(ref v) => {
-                            if v != value {
-                                return VerificationResult::Fail {
-                                    reason: format!(
-                                        "{} / {} has an invalid config value ({}), requires {}",
-                                        application, config.name, v, value
-                                    ),
-                                };
-                            }
+                    if let Some(ref v) = config.value {
+                        if v != value {
+                            return VerificationResult::Fail {
+                                reason: format!(
+                                    "{} / {} has an invalid config value ({}), requires {}",
+                                    application, config.name, v, value
+                                ),
+                            };
                         }
-                        None => {}
                     }
                 } else {
                     return VerificationResult::Fail {
