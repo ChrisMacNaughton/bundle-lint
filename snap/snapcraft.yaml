@@ -1,0 +1,24 @@
+name: bundle-lint
+base: core18
+version: '0.1.0'
+summary: Linter for juju bundles or deployed models # 79 char long summary
+description: |
+  bundle-lint is a simple package that can map configured rules
+  to a bundle or deployed model to verify that required / conflicting
+  configuration options are correctly setup.
+license: Apache-2.0
+grade: stable
+confinement: classic
+
+parts:
+  bundle-lint:
+    plugin: rust
+    source: .
+
+apps:
+  bundle-lint:
+    adapter: none
+    command: ./bin/bundle-lint
+    plugs:
+    - home
+    - network

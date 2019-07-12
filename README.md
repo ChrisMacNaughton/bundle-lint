@@ -1,6 +1,6 @@
-# JujuLint
+# BundleLint
 
-JujuLint is a basic program to lint a bundle or deployed Juju model against a set of rules. These rules are easily writable in a yaml format.
+BundleLint is a basic program to lint a bundle or deployed Juju model against a set of rules. These rules are easily writable in a yaml format.
 
 ## Usage
 

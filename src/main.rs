@@ -1,4 +1,4 @@
-extern crate juju_lint;
+extern crate bundle_lint;
 
 use failure::Error;
 use std::path::PathBuf;
@@ -7,7 +7,7 @@ use log::{debug, info, Level};
 
 use structopt::StructOpt;
 
-use juju_lint::juju;
+use bundle_lint::juju;
 
 #[derive(Debug, StructOpt)]
 #[structopt(
@@ -72,13 +72,13 @@ fn main() -> Result<(), Error> {
         Command::Model(model) => juju::Model::export_bundle(&model.name)?,
     };
     info!("Loaded bundle: {:#?}", bundle);
-    let rules = juju_lint::import_rules(&options.config_repo)?;
+    let rules = bundle_lint::import_rules(&options.config_repo)?;
     info!("Loaded rules: {:?}", rules);
     let mut passing = true;
     for rule in rules {
         match rule.verify(&bundle) {
-            juju_lint::VerificationResult::Pass => {}
-            juju_lint::VerificationResult::Fail { reason } => {
+            bundle_lint::VerificationResult::Pass => {}
+            bundle_lint::VerificationResult::Fail { reason } => {
                 println!("{} rule failed: {}", rule.charm_name, reason);
                 passing = false;
             }
@@ -88,6 +88,6 @@ fn main() -> Result<(), Error> {
         println!("Passed all configured lints");
         Ok(())
     } else {
-        Err(juju_lint::JujuLintError::LintFailure.into())
+        Err(bundle_lint::JujuLintError::LintFailure.into())
     }
 }
