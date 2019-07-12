@@ -1,7 +1,7 @@
-use std::path::PathBuf;
 use failure::Error;
 use log::debug;
 use std::fs;
+use std::path::PathBuf;
 use std::process::Command;
 
 use super::bundle::Bundle;

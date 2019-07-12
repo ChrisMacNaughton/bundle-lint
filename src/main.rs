@@ -23,7 +23,12 @@ struct Opt {
     /// This cna be a local file path or a path to a repository on a hosted
     /// git server. It is also possible to use gh:namespace/repo.git as a
     /// shorthand to a github repository.
-    #[structopt(name = "config_repo", short = "c", long = "config_repo", default_value = "gh:ChrisMacNaughton/bundlelint-rules")]
+    #[structopt(
+        name = "config_repo",
+        short = "c",
+        long = "config_repo",
+        default_value = "gh:ChrisMacNaughton/bundlelint-rules"
+    )]
     config_repo: String,
     #[structopt(subcommand)] // Note that we mark a field as a subcommand
     command: Command,
@@ -64,7 +69,7 @@ fn main() -> Result<(), Error> {
     debug!("Running with {:?}", options);
     let bundle = match options.command {
         Command::Bundle(bundle) => juju::Model::load_bundle(&bundle.bundle_path)?,
-        Command::Model(model) => juju::Model::export_bundle(&model.name)?
+        Command::Model(model) => juju::Model::export_bundle(&model.name)?,
     };
     info!("Loaded bundle: {:#?}", bundle);
     let rules = juju_lint::import_rules(&options.config_repo)?;
@@ -72,8 +77,8 @@ fn main() -> Result<(), Error> {
     let mut passing = true;
     for rule in rules {
         match rule.verify(&bundle) {
-            juju_lint::VerificationResult::Pass => {},
-            juju_lint::VerificationResult::Fail{reason} => {
+            juju_lint::VerificationResult::Pass => {}
+            juju_lint::VerificationResult::Fail { reason } => {
                 println!("{} rule failed: {}", rule.charm_name, reason);
                 passing = false;
             }

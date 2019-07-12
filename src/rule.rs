@@ -4,8 +4,8 @@ use failure::Error;
 use log::debug;
 use serde::{Deserialize, Serialize};
 
-use crate::juju::Bundle;
 use crate::fetch;
+use crate::juju::Bundle;
 
 #[cfg(test)]
 mod tests {
@@ -79,7 +79,7 @@ applications:
         assert_eq!(verification, VerificationResult::Fail{reason: "test-thing-2 / conflicts-with-cool-thing has an invalid config value (True), forbids True".into()});
     }
 
-        #[test]
+    #[test]
     fn it_validates_a_passing_specific_forbids_rule() {
         let bundle = Bundle::load(BUNDLE).unwrap();
         let forbids = {

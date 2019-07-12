@@ -5,8 +5,8 @@ pub(crate) mod fetch;
 pub mod juju;
 mod rule;
 
-pub use rule::{Rule, VerificationResult};
 pub use rule::import as import_rules;
+pub use rule::{Rule, VerificationResult};
 
 // This is a new error type that you've created. It represents the ways a
 // toolchain could be invalid.

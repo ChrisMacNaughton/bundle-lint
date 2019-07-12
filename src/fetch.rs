@@ -7,7 +7,7 @@ use std::process::Command;
 use failure::Error;
 use log::trace;
 
-pub fn load(path: &str) -> Result<PathBuf, Error>{
+pub fn load(path: &str) -> Result<PathBuf, Error> {
     trace!("About to download {}", path);
     let mut local_path = temp_dir();
     local_path.push("juju_lint_base");
@@ -32,7 +32,8 @@ pub fn import(path: &PathBuf) -> Result<Vec<Rule>, Error> {
         if path.is_file() {
             if let Some(extension) = path.extension().map(|a| a.to_string_lossy()) {
                 if extension == "yaml" {
-                    let mut local_rules: Vec<Rule> = serde_yaml::from_str(&fs::read_to_string(path)?)?;
+                    let mut local_rules: Vec<Rule> =
+                        serde_yaml::from_str(&fs::read_to_string(path)?)?;
                     rules.append(&mut local_rules);
                 }
             }
