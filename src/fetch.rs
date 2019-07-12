@@ -11,7 +11,10 @@ pub fn load(path: &str) -> Result<PathBuf, Error> {
     trace!("About to download {}", path);
     let xdg_dirs = xdg::BaseDirectories::with_prefix("bundle-lint")?;
     let local_path = xdg_dirs.place_cache_file("juju_lint_base")?;
-    debug!("Trying to store rule configuration in {}", local_path.display());
+    debug!(
+        "Trying to store rule configuration in {}",
+        local_path.display()
+    );
     if local_path.exists() {
         fs::remove_dir_all(&local_path)?;
     }
