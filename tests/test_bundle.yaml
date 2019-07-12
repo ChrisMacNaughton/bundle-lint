@@ -1,0 +1,10 @@
+series: bionic
+applications:
+  ubuntu:
+    charm: cs:ubuntu-12
+    num_units: 1
+    to:
+    - "0"
+machines:
+  "0":
+    constraints: virt-type=kvm
