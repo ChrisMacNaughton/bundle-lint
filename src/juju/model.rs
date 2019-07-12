@@ -1,5 +1,7 @@
+use std::path::PathBuf;
 use failure::Error;
 use log::debug;
+use std::fs;
 use std::process::Command;
 
 use super::bundle::Bundle;
@@ -14,5 +16,9 @@ impl Model {
         let output = cmd.output()?;
         debug!("Got output from juju: {:?}", output);
         Bundle::load(&String::from_utf8_lossy(&output.stdout))
+    }
+
+    pub fn load_bundle(path: &PathBuf) -> Result<Bundle, Error> {
+        Bundle::load(&fs::read_to_string(path)?)
     }
 }

@@ -43,9 +43,9 @@ struct Bundle {
     /// Bundle to lint
     #[structopt(name = "bundle")]
     bundle_path: PathBuf,
-    /// Bundles to overlay on the primary bundle, applied in order
-    #[structopt(long = "overlay", multiple = true)]
-    overlays: Vec<PathBuf>,
+    // /// Bundles to overlay on the primary bundle, applied in order
+    // #[structopt(long = "overlay", multiple = true)]
+    // overlays: Vec<PathBuf>,
 }
 #[derive(StructOpt, Debug)]
 struct Model {
@@ -63,11 +63,8 @@ fn main() -> Result<(), Error> {
     simple_logger::init_with_level(level).expect("Couldn't initialize logger");
     debug!("Running with {:?}", options);
     let bundle = match options.command {
-        Command::Bundle(_bundle) => unimplemented!(),
-        Command::Model(model) => {
-            let bundle = juju::Model::export_bundle(&model.name)?;
-            bundle
-        }
+        Command::Bundle(bundle) => juju::Model::load_bundle(&bundle.bundle_path)?,
+        Command::Model(model) => juju::Model::export_bundle(&model.name)?
     };
     info!("Loaded bundle: {:#?}", bundle);
     let rules = juju_lint::import_rules(&options.config_repo)?;
