@@ -48,7 +48,7 @@ applications:
             config: Config {
                 requires: HashMap::new(),
                 forbids,
-            }
+            },
         };
         let verification = rule.verify(&bundle);
 
@@ -74,9 +74,9 @@ applications:
             config_name: "use-cool-thing".to_string(),
             config_value: "True".to_string(),
             config: Config {
-            requires: HashMap::new(),
-            forbids,
-        }
+                requires: HashMap::new(),
+                forbids,
+            },
         };
         let verification = rule.verify(&bundle);
 
@@ -102,9 +102,9 @@ applications:
             config_name: "use-cool-thing".to_string(),
             config_value: "True".to_string(),
             config: Config {
-            requires: HashMap::new(),
-            forbids,
-        }
+                requires: HashMap::new(),
+                forbids,
+            },
         };
         let verification = rule.verify(&bundle);
 
@@ -132,7 +132,7 @@ applications:
             config: Config {
                 requires,
                 forbids: HashMap::new(),
-            }
+            },
         };
         let verification = rule.verify(&bundle);
         assert_eq!(verification, VerificationResult::Pass);
