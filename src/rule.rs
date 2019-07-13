@@ -34,7 +34,7 @@ applications:
             let mut h = HashMap::new();
             h.insert(
                 "test-thing-2".to_string(),
-                Config {
+                ConfigValue {
                     name: "conflicts-with-cool-thing".to_string(),
                     value: None,
                 },
@@ -45,8 +45,10 @@ applications:
             charm_name: "test-thing".to_string(),
             config_name: "use-cool-thing".to_string(),
             config_value: "True".to_string(),
-            requires: HashMap::new(),
-            forbids,
+            config: Config {
+                requires: HashMap::new(),
+                forbids,
+            }
         };
         let verification = rule.verify(&bundle);
 
@@ -60,7 +62,7 @@ applications:
             let mut h = HashMap::new();
             h.insert(
                 "test-thing-2".to_string(),
-                Config {
+                ConfigValue {
                     name: "conflicts-with-cool-thing".to_string(),
                     value: Some("True".into()),
                 },
@@ -71,8 +73,10 @@ applications:
             charm_name: "test-thing".to_string(),
             config_name: "use-cool-thing".to_string(),
             config_value: "True".to_string(),
+            config: Config {
             requires: HashMap::new(),
             forbids,
+        }
         };
         let verification = rule.verify(&bundle);
 
@@ -86,7 +90,7 @@ applications:
             let mut h = HashMap::new();
             h.insert(
                 "test-thing-2".to_string(),
-                Config {
+                ConfigValue {
                     name: "conflicts-with-cool-thing".to_string(),
                     value: Some("False".into()),
                 },
@@ -97,8 +101,10 @@ applications:
             charm_name: "test-thing".to_string(),
             config_name: "use-cool-thing".to_string(),
             config_value: "True".to_string(),
+            config: Config {
             requires: HashMap::new(),
             forbids,
+        }
         };
         let verification = rule.verify(&bundle);
 
@@ -112,7 +118,7 @@ applications:
             let mut h = HashMap::new();
             h.insert(
                 "test-thing-3".to_string(),
-                Config {
+                ConfigValue {
                     name: "required-by-cool-thing".to_string(),
                     value: None,
                 },
@@ -123,8 +129,10 @@ applications:
             charm_name: "test-thing".to_string(),
             config_name: "use-cool-thing".to_string(),
             config_value: "True".to_string(),
-            requires,
-            forbids: HashMap::new(),
+            config: Config {
+                requires,
+                forbids: HashMap::new(),
+            }
         };
         let verification = rule.verify(&bundle);
         assert_eq!(verification, VerificationResult::Pass);
@@ -142,14 +150,19 @@ pub struct Rule {
     pub charm_name: String,
     pub config_name: String,
     pub config_value: String,
-    #[serde(default)]
-    pub requires: HashMap<String, Config>,
-    #[serde(default)]
-    pub forbids: HashMap<String, Config>,
+    pub config: Config,
 }
 
 #[derive(Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct Config {
+    #[serde(default)]
+    pub requires: HashMap<String, ConfigValue>,
+    #[serde(default)]
+    pub forbids: HashMap<String, ConfigValue>,
+}
+
+#[derive(Debug, Deserialize, Eq, PartialEq, Serialize)]
+pub struct ConfigValue {
     pub name: String,
     pub value: Option<String>,
 }
@@ -190,7 +203,7 @@ impl Rule {
     }
 
     fn verify_requires(&self, bundle: &Bundle) -> VerificationResult {
-        for (application, config) in &self.requires {
+        for (application, config) in &self.config.requires {
             if let Some(other_app) = bundle.application(application) {
                 if let Some(value) = other_app.option(&config.name) {
                     if let Some(ref v) = config.value {
@@ -217,7 +230,7 @@ impl Rule {
     }
 
     fn verify_forbids(&self, bundle: &Bundle) -> VerificationResult {
-        for (application, config) in &self.forbids {
+        for (application, config) in &self.config.forbids {
             if let Some(other_app) = bundle.application(application) {
                 if let Some(value) = other_app.option(&config.name) {
                     match config.value {
