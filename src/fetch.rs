@@ -8,6 +8,11 @@ use log::{debug, trace};
 use xdg;
 
 pub fn load(path: &str) -> Result<PathBuf, Error> {
+    let p = PathBuf::from(path);
+    if p.exists() {
+        debug!("Using local Rule path: {}", path);
+        return Ok(p);
+    }
     trace!("About to download {}", path);
     let xdg_dirs = xdg::BaseDirectories::with_prefix("bundle-lint")?;
     let local_path = xdg_dirs.place_cache_file("juju_lint_base")?;
