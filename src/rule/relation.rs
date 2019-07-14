@@ -1,6 +1,5 @@
-use failure::Error;
 use crate::juju::{Application, Bundle};
-use log::debug;
+use failure::Error;
 use serde::{Deserialize, Serialize};
 
 use crate::rule::VerificationResult;
@@ -18,8 +17,8 @@ config:
 requires:
 - - 'neutron-api:neutron-plugin-api'
   - 'neutron-openvswitch:neutron-plugin-api'"#;
-          let relation = Relation::parse(&rel_yaml).unwrap();
-          assert_eq!(relation.requires[0][0], "neutron-api:neutron-plugin-api");
+        let relation = Relation::parse(&rel_yaml).unwrap();
+        assert_eq!(relation.requires[0][0], "neutron-api:neutron-plugin-api");
     }
 }
 
@@ -39,7 +38,6 @@ pub struct ConfigDetail {
 }
 
 impl Relation {
-
     pub fn parse(input: &str) -> Result<Relation, Error> {
         Ok(serde_yaml::from_str(&input)?)
     }
@@ -62,10 +60,14 @@ impl Relation {
 
     fn verify_required(&self, bundle: &Bundle) -> VerificationResult {
         for relation in &self.requires {
-            if ! bundle.relations.iter().any(|b_relation| {
-                b_relation.iter().all(|k| relation.contains(k))
-            }) {
-               return VerificationResult::Fail { reason: "Missing a required relation".into() };
+            if !bundle
+                .relations
+                .iter()
+                .any(|b_relation| b_relation.iter().all(|k| relation.contains(k)))
+            {
+                return VerificationResult::Fail {
+                    reason: "Missing a required relation".into(),
+                };
             }
         }
         VerificationResult::Pass
@@ -73,10 +75,14 @@ impl Relation {
 
     fn verify_forbids(&self, bundle: &Bundle) -> VerificationResult {
         for relation in &self.forbids {
-            if bundle.relations.iter().any(|b_relation| {
-                b_relation.iter().all(|k| relation.contains(k))
-            }) {
-               return VerificationResult::Fail { reason: "Missing a required relation".into() };
+            if bundle
+                .relations
+                .iter()
+                .any(|b_relation| b_relation.iter().all(|k| relation.contains(k)))
+            {
+                return VerificationResult::Fail {
+                    reason: "Missing a required relation".into(),
+                };
             }
         }
         VerificationResult::Pass

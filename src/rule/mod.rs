@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use failure::Error;
 use log::debug;
 use serde::{Deserialize, Serialize};
@@ -15,6 +13,8 @@ pub use relation::Relation;
 
 #[cfg(test)]
 mod tests {
+    use std::collections::HashMap;
+
     use super::*;
 
     const BUNDLE: &'static str = r#"
@@ -195,7 +195,8 @@ impl Rule {
                 }
             }
             for relation in &self.relations {
-                if let VerificationResult::Fail { reason: f } = relation.verify(&application, &bundle)
+                if let VerificationResult::Fail { reason: f } =
+                    relation.verify(&application, &bundle)
                 {
                     return VerificationResult::Fail { reason: f };
                 }
