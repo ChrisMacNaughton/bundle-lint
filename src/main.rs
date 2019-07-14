@@ -30,32 +30,9 @@ struct Opt {
         default_value = "gh:ChrisMacNaughton/bundlelint-rules"
     )]
     config_repo: String,
-    #[structopt(subcommand)] // Note that we mark a field as a subcommand
-    command: Command,
-}
-
-#[derive(StructOpt, Debug)]
-enum Command {
-    #[structopt(name = "bundle")]
-    /// A bundle that will be deployed
-    Bundle(Bundle),
-    #[structopt(name = "model")]
-    /// A running Juju model
-    Model(Model),
-}
-#[derive(StructOpt, Debug)]
-struct Bundle {
     /// Bundle to lint
     #[structopt(name = "bundle")]
     bundle_path: PathBuf,
-    // /// Bundles to overlay on the primary bundle, applied in order
-    // #[structopt(long = "overlay", multiple = true)]
-    // overlays: Vec<PathBuf>,
-}
-#[derive(StructOpt, Debug)]
-struct Model {
-    #[structopt(help = "Name of the model to lint")]
-    name: String,
 }
 
 fn main() -> Result<(), Error> {
@@ -67,10 +44,7 @@ fn main() -> Result<(), Error> {
     };
     simple_logger::init_with_level(level).expect("Couldn't initialize logger");
     debug!("Running with {:?}", options);
-    let bundle = match options.command {
-        Command::Bundle(bundle) => juju::Model::load_bundle(&bundle.bundle_path)?,
-        Command::Model(model) => juju::Model::export_bundle(&model.name)?,
-    };
+    let bundle = juju::Model::load_bundle(options.bundle_path)?;
     info!("Loaded bundle: {:#?}", bundle);
     let rules = bundle_lint::import_rules(&options.config_repo)?;
     info!("Loaded rules: {:?}", rules);

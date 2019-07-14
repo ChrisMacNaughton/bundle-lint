@@ -18,7 +18,12 @@ impl Model {
         Bundle::load(&String::from_utf8_lossy(&output.stdout))
     }
 
-    pub fn load_bundle(path: &PathBuf) -> Result<Bundle, Error> {
+    pub fn load_bundle(path: PathBuf) -> Result<Bundle, Error> {
+        let path = if path == PathBuf::from("-") {
+            PathBuf::from("/dev/stdin")
+        } else {
+            path
+        };
         Bundle::load(&fs::read_to_string(path)?)
     }
 }

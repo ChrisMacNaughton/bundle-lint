@@ -6,13 +6,8 @@ BundleLint is a basic program to lint a bundle or deployed Juju model against a 
 
 The most basic usage is:
 
-    juju-lint model $JUJU_MODEL
+    juju-lint $BUNDLE_PATH
 
-Additionally, a `debug` flag (`-d`) can be passed to the base command to add more verbose output:
+If you would like to run `bundle-lint` against a running model, you can run:
 
-    juju-lint -d model $JUJU_MODEL
-
-To run juju-lint against a bundle rather than a model, call it like:
-
-    juju-lint bundle $BUNDLE_PATH
-
+    juju export-bundle -m $MODEL_NAME | juju-lint -
