@@ -24,6 +24,8 @@ pub struct Bundle {
     pub applications: HashMap<String, Application>,
     #[serde(default, skip_serializing_if = "HashMap::is_empty")]
     pub machines: HashMap<String, Machine>,
+    #[serde(default)]
+    pub relations: Vec<[String; 2]>,
 }
 
 impl Bundle {

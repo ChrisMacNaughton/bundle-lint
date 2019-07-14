@@ -49,6 +49,7 @@ impl Config {
         }
         VerificationResult::Pass
     }
+
     fn verify_required(&self, bundle: &Bundle) -> VerificationResult {
         for (application, config) in &self.requires {
             if let Some(other_app) = bundle.application(application) {

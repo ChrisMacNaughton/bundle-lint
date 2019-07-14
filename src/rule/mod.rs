@@ -70,7 +70,7 @@ applications:
                 requires: HashMap::new(),
                 forbids,
             }],
-            relation: vec![Relation::default()],
+            relations: vec![Relation::default()],
         };
         let verification = rule.verify(&bundle);
 
@@ -99,7 +99,7 @@ applications:
                 requires: HashMap::new(),
                 forbids,
             }],
-            relation: vec![Relation::default()],
+            relations: vec![Relation::default()],
         };
         let verification = rule.verify(&bundle);
 
@@ -128,7 +128,7 @@ applications:
                 requires: HashMap::new(),
                 forbids,
             }],
-            relation: vec![Relation::default()],
+            relations: vec![Relation::default()],
         };
         let verification = rule.verify(&bundle);
 
@@ -157,7 +157,7 @@ applications:
                 requires,
                 forbids: HashMap::new(),
             }],
-            relation: vec![Relation::default()],
+            relations: vec![Relation::default()],
         };
         let verification = rule.verify(&bundle);
         assert_eq!(verification, VerificationResult::Pass);
@@ -176,7 +176,7 @@ pub struct Rule {
     #[serde(default)]
     pub config: Vec<Config>,
     #[serde(default)]
-    pub relation: Vec<Relation>,
+    pub relations: Vec<Relation>,
 }
 
 #[derive(Debug, Eq, PartialEq)]
@@ -190,6 +190,12 @@ impl Rule {
         if let Some(application) = bundle.application(&self.charm_name) {
             for config in &self.config {
                 if let VerificationResult::Fail { reason: f } = config.verify(&application, &bundle)
+                {
+                    return VerificationResult::Fail { reason: f };
+                }
+            }
+            for relation in &self.relations {
+                if let VerificationResult::Fail { reason: f } = relation.verify(&application, &bundle)
                 {
                     return VerificationResult::Fail { reason: f };
                 }

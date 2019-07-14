@@ -36,6 +36,7 @@ pub fn import(path: &PathBuf) -> Result<Vec<Rule>, Error> {
             if let Some(extension) = path.extension().map(|a| a.to_string_lossy()) {
                 if extension == "yaml" {
                     let rule_yaml = fs::read_to_string(path)?;
+                    debug!("Loding rules from:\n{}", rule_yaml);
                     let mut local_rules: Vec<Rule> = serde_yaml::from_str(&rule_yaml)?;
                     rules.append(&mut local_rules);
                 }
