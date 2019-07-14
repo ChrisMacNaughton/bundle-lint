@@ -11,8 +11,8 @@ use bundle_lint::juju;
 
 #[derive(Debug, StructOpt)]
 #[structopt(
-    name = "juju-lint",
-    about = "A program to lint Juju models and bundles."
+    name = "bundle-lint",
+    about = "A program to lint Juju models and bundles.",
 )]
 struct Opt {
     /// Activate debug mode
