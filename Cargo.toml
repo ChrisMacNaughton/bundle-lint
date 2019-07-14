@@ -14,3 +14,4 @@ serde = { version = "1.0", features = ["derive"] }
 serde_yaml = "0.8"
 failure = "0.1.5"
 xdg = "2.2.0"
+git2 = "0.9.1"

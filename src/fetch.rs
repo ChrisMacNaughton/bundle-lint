@@ -1,9 +1,9 @@
 use crate::rule::Rule;
 use std::fs;
 use std::path::PathBuf;
-use std::process::Command;
 
 use failure::Error;
+use git2::Repository;
 use log::{debug, trace};
 use xdg;
 
@@ -23,12 +23,7 @@ pub fn load(path: &str) -> Result<PathBuf, Error> {
     if local_path.exists() {
         fs::remove_dir_all(&local_path)?;
     }
-    let mut cmd = Command::new("git");
-    cmd.arg("clone");
-    cmd.arg("--depth=1");
-    cmd.arg(path);
-    cmd.arg(&local_path);
-    cmd.output()?;
+    Repository::clone(path, &local_path)?;
     Ok(local_path)
 }
 

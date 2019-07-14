@@ -8,14 +8,22 @@ description: |
   configuration options are correctly setup.
 license: Apache-2.0
 grade: stable
-confinement: classic
+confinement: strict
 
 parts:
   bundle-lint:
     plugin: rust
     source: .
-
+    stage-packages:
+      - pkg-config
+      - libssl-dev
+    stage-snaps:
+    - juju
 apps:
   bundle-lint:
     adapter: none
     command: ./bin/bundle-lint
+    plugs:
+      - home
+      - network
+      - juju-client-observe
