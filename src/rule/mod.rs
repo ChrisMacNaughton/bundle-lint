@@ -34,6 +34,21 @@ applications:
 "#;
 
     #[test]
+    fn it_parses_a_rule() {
+        let yaml_s = r#"- charm_name: neutron-api
+  config:
+    -
+      config_name: enable-dvr
+      config_value: 'True'
+      requires:
+        neutron-openvswitch:
+          name: bridge-mappings
+"#;
+        let rules: Vec<Rule> = serde_yaml::from_str(yaml_s).unwrap();
+        assert_eq!(rules[0].charm_name, "neutron-api");
+    }
+
+    #[test]
     fn it_validates_a_basic_forbids_rule() {
         let bundle = Bundle::load(BUNDLE).unwrap();
         let forbids = {
@@ -49,13 +64,13 @@ applications:
         };
         let rule = Rule {
             charm_name: "test-thing".to_string(),
-            config_name: "use-cool-thing".to_string(),
-            config_value: "True".to_string(),
-            config: Config {
+            config: vec![Config {
+                config_name: "use-cool-thing".to_string(),
+                config_value: "True".to_string(),
                 requires: HashMap::new(),
                 forbids,
-            },
-            relation: Relation::default(),
+            }],
+            relation: vec![Relation::default()],
         };
         let verification = rule.verify(&bundle);
 
@@ -78,13 +93,13 @@ applications:
         };
         let rule = Rule {
             charm_name: "test-thing".to_string(),
-            config_name: "use-cool-thing".to_string(),
-            config_value: "True".to_string(),
-            config: Config {
+            config: vec![Config {
+                config_name: "use-cool-thing".to_string(),
+                config_value: "True".to_string(),
                 requires: HashMap::new(),
                 forbids,
-            },
-            relation: Relation::default(),
+            }],
+            relation: vec![Relation::default()],
         };
         let verification = rule.verify(&bundle);
 
@@ -107,13 +122,13 @@ applications:
         };
         let rule = Rule {
             charm_name: "test-thing".to_string(),
-            config_name: "use-cool-thing".to_string(),
-            config_value: "True".to_string(),
-            config: Config {
+            config: vec![Config {
+                config_name: "use-cool-thing".to_string(),
+                config_value: "True".to_string(),
                 requires: HashMap::new(),
                 forbids,
-            },
-            relation: Relation::default(),
+            }],
+            relation: vec![Relation::default()],
         };
         let verification = rule.verify(&bundle);
 
@@ -136,13 +151,13 @@ applications:
         };
         let rule = Rule {
             charm_name: "test-thing".to_string(),
-            config_name: "use-cool-thing".to_string(),
-            config_value: "True".to_string(),
-            config: Config {
+            config: vec![Config {
+                config_name: "use-cool-thing".to_string(),
+                config_value: "True".to_string(),
                 requires,
                 forbids: HashMap::new(),
-            },
-            relation: Relation::default(),
+            }],
+            relation: vec![Relation::default()],
         };
         let verification = rule.verify(&bundle);
         assert_eq!(verification, VerificationResult::Pass);
@@ -158,12 +173,10 @@ pub fn import(config_path: &str) -> Result<Vec<Rule>, Error> {
 #[derive(Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct Rule {
     pub charm_name: String,
-    pub config_name: String,
-    pub config_value: String,
     #[serde(default)]
-    pub config: Config,
+    pub config: Vec<Config>,
     #[serde(default)]
-    pub relation: Relation,
+    pub relation: Vec<Relation>,
 }
 
 #[derive(Debug, Eq, PartialEq)]
@@ -175,11 +188,10 @@ pub enum VerificationResult {
 impl Rule {
     pub fn verify(&self, bundle: &Bundle) -> VerificationResult {
         if let Some(application) = bundle.application(&self.charm_name) {
-            if let Some(value) = application.option(&self.config_name) {
-                if *value == self.config_value {
-                    if let VerificationResult::Fail { reason: f } = self.config.verify(&bundle) {
-                        return VerificationResult::Fail { reason: f };
-                    }
+            for config in &self.config {
+                if let VerificationResult::Fail { reason: f } = config.verify(&application, &bundle)
+                {
+                    return VerificationResult::Fail { reason: f };
                 }
             }
         }

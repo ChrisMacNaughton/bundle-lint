@@ -61,7 +61,7 @@ struct Model {
 fn main() -> Result<(), Error> {
     let options = Opt::from_args();
     let level = if options.debug {
-        Level::Debug
+        Level::Trace
     } else {
         Level::Warn
     };
