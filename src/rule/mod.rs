@@ -7,6 +7,12 @@ use serde::{Deserialize, Serialize};
 use crate::fetch;
 use crate::juju::Bundle;
 
+mod config;
+mod relation;
+
+pub use config::{Config, ConfigValue};
+pub use relation::Relation;
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -49,6 +55,7 @@ applications:
                 requires: HashMap::new(),
                 forbids,
             },
+            relation: Relation::default(),
         };
         let verification = rule.verify(&bundle);
 
@@ -77,6 +84,7 @@ applications:
                 requires: HashMap::new(),
                 forbids,
             },
+            relation: Relation::default(),
         };
         let verification = rule.verify(&bundle);
 
@@ -105,6 +113,7 @@ applications:
                 requires: HashMap::new(),
                 forbids,
             },
+            relation: Relation::default(),
         };
         let verification = rule.verify(&bundle);
 
@@ -133,6 +142,7 @@ applications:
                 requires,
                 forbids: HashMap::new(),
             },
+            relation: Relation::default(),
         };
         let verification = rule.verify(&bundle);
         assert_eq!(verification, VerificationResult::Pass);
@@ -150,27 +160,10 @@ pub struct Rule {
     pub charm_name: String,
     pub config_name: String,
     pub config_value: String,
+    #[serde(default)]
     pub config: Config,
-}
-
-#[derive(Debug, Deserialize, Eq, PartialEq, Serialize)]
-pub struct Config {
     #[serde(default)]
-    pub requires: HashMap<String, ConfigValue>,
-    #[serde(default)]
-    pub forbids: HashMap<String, ConfigValue>,
-}
-
-#[derive(Debug, Deserialize, Eq, PartialEq, Serialize)]
-pub struct ConfigValue {
-    pub name: String,
-    pub value: Option<String>,
-}
-
-impl Config {
-    // pub fn matches(&self, config_name: &String, config_value: &String) -> bool {
-    //     false
-    // }
+    pub relation: Relation,
 }
 
 #[derive(Debug, Eq, PartialEq)]
@@ -184,74 +177,8 @@ impl Rule {
         if let Some(application) = bundle.application(&self.charm_name) {
             if let Some(value) = application.option(&self.config_name) {
                 if *value == self.config_value {
-                    match self.verify_requires(bundle) {
-                        VerificationResult::Pass => {}
-                        VerificationResult::Fail { reason: f } => {
-                            return VerificationResult::Fail { reason: f }
-                        }
-                    }
-                    match self.verify_forbids(bundle) {
-                        VerificationResult::Pass => {}
-                        VerificationResult::Fail { reason: f } => {
-                            return VerificationResult::Fail { reason: f }
-                        }
-                    }
-                }
-            }
-        }
-        VerificationResult::Pass
-    }
-
-    fn verify_requires(&self, bundle: &Bundle) -> VerificationResult {
-        for (application, config) in &self.config.requires {
-            if let Some(other_app) = bundle.application(application) {
-                if let Some(value) = other_app.option(&config.name) {
-                    if let Some(ref v) = config.value {
-                        if v != value {
-                            return VerificationResult::Fail {
-                                reason: format!(
-                                    "{} / {} has an invalid config value ({}), requires {}",
-                                    application, config.name, v, value
-                                ),
-                            };
-                        }
-                    }
-                } else {
-                    return VerificationResult::Fail {
-                        reason: format!(
-                            "{} / {} has a missing config value",
-                            application, config.name
-                        ),
-                    };
-                }
-            }
-        }
-        VerificationResult::Pass
-    }
-
-    fn verify_forbids(&self, bundle: &Bundle) -> VerificationResult {
-        for (application, config) in &self.config.forbids {
-            if let Some(other_app) = bundle.application(application) {
-                if let Some(value) = other_app.option(&config.name) {
-                    match config.value {
-                        Some(ref v) => {
-                            if v == value {
-                                return VerificationResult::Fail {
-                                    reason: format!(
-                                        "{} / {} has an invalid config value ({}), forbids {}",
-                                        application, config.name, v, value
-                                    ),
-                                };
-                            }
-                        }
-                        None => {
-                            return VerificationResult::Fail {
-                                reason: format!(
-                                    "{} / {} has an extra config value, forbids {}",
-                                    application, config.name, value
-                                ),
-                            }
-                        }
+                    if let VerificationResult::Fail { reason: f } = self.config.verify(&bundle) {
+                        return VerificationResult::Fail { reason: f };
                     }
                 }
             }
