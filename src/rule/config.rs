@@ -16,7 +16,7 @@ mod tests {
 config_value: 'True'
 requires:
   neutron-openvswitch:
-    name: bridge-mappings"#;
+    - name: bridge-mappings"#;
         let config = Config::parse(&config_yaml).unwrap();
         assert_eq!(config.config_name, "enable-dvr");
     }
@@ -27,9 +27,9 @@ pub struct Config {
     pub config_name: String,
     pub config_value: String,
     #[serde(default)]
-    pub requires: HashMap<String, ConfigValue>,
+    pub requires: HashMap<String, Vec<ConfigValue>>,
     #[serde(default)]
-    pub forbids: HashMap<String, ConfigValue>,
+    pub forbids: HashMap<String, Vec<ConfigValue>>,
 }
 
 impl Config {
@@ -53,24 +53,26 @@ impl Config {
     fn verify_required(&self, bundle: &Bundle) -> VerificationResult {
         for (application, config) in &self.requires {
             if let Some(other_app) = bundle.application(application) {
-                if let Some(value) = other_app.option(&config.name) {
-                    if let Some(ref v) = config.value {
-                        if v != value {
-                            return VerificationResult::Fail {
-                                reason: format!(
-                                    "{} / {} has an invalid config value ({}), requires {}",
-                                    application, config.name, v, value
-                                ),
-                            };
+                for config in config {
+                    if let Some(value) = other_app.option(&config.name) {
+                        if let Some(ref v) = config.value {
+                            if v != value {
+                                return VerificationResult::Fail {
+                                    reason: format!(
+                                        "{} / {} has an invalid config value ({}), requires {}",
+                                        application, config.name, v, value
+                                    ),
+                                };
+                            }
                         }
+                    } else {
+                        return VerificationResult::Fail {
+                            reason: format!(
+                                "{} / {} has a missing config value",
+                                application, config.name
+                            ),
+                        };
                     }
-                } else {
-                    return VerificationResult::Fail {
-                        reason: format!(
-                            "{} / {} has a missing config value",
-                            application, config.name
-                        ),
-                    };
                 }
             }
         }
@@ -80,24 +82,26 @@ impl Config {
     fn verify_forbids(&self, bundle: &Bundle) -> VerificationResult {
         for (application, config) in &self.forbids {
             if let Some(other_app) = bundle.application(application) {
-                if let Some(value) = other_app.option(&config.name) {
-                    match config.value {
-                        Some(ref v) => {
-                            if v == value {
+                for config in config {
+                    if let Some(value) = other_app.option(&config.name) {
+                        match config.value {
+                            Some(ref v) => {
+                                if v == value {
+                                    return VerificationResult::Fail {
+                                        reason: format!(
+                                            "{} / {} has an invalid config value ({}), forbids {}",
+                                            application, config.name, v, value
+                                        ),
+                                    };
+                                }
+                            }
+                            None => {
                                 return VerificationResult::Fail {
                                     reason: format!(
-                                        "{} / {} has an invalid config value ({}), forbids {}",
-                                        application, config.name, v, value
+                                        "{} / {} has an extra config value, forbids {}",
+                                        application, config.name, value
                                     ),
-                                };
-                            }
-                        }
-                        None => {
-                            return VerificationResult::Fail {
-                                reason: format!(
-                                    "{} / {} has an extra config value, forbids {}",
-                                    application, config.name, value
-                                ),
+                                }
                             }
                         }
                     }
