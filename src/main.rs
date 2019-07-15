@@ -2,8 +2,9 @@ extern crate bundle_lint;
 
 use failure::Error;
 use std::path::PathBuf;
+use std::process;
 
-use log::{debug, info, Level};
+use log::{debug, Level};
 
 use structopt::StructOpt;
 
@@ -12,7 +13,7 @@ use bundle_lint::juju;
 #[derive(Debug, StructOpt)]
 #[structopt(
     name = "bundle-lint",
-    about = "A program to lint Juju models and bundles.",
+    about = "A program to lint Juju models and bundles."
 )]
 struct Opt {
     /// Activate debug mode
@@ -44,10 +45,29 @@ fn main() -> Result<(), Error> {
     };
     simple_logger::init_with_level(level).expect("Couldn't initialize logger");
     debug!("Running with {:?}", options);
-    let bundle = juju::Model::load_bundle(options.bundle_path)?;
-    info!("Loaded bundle: {:#?}", bundle);
-    let rules = bundle_lint::import_rules(&options.config_repo)?;
-    info!("Loaded rules: {:?}", rules);
+    let bundle = match juju::Model::load_bundle(options.bundle_path.clone()) {
+        Ok(b) => b,
+        Err(e) => {
+            println!(
+                "Failed to load the bundle ({}): {}",
+                options.bundle_path.display(),
+                e
+            );
+            process::exit(1);
+        }
+    };
+    debug!("Loaded bundle: {:#?}", bundle);
+    let rules = match bundle_lint::import_rules(&options.config_repo) {
+        Ok(b) => b,
+        Err(e) => {
+            println!(
+                "Failed to load the configuration at {}: {}",
+                options.config_repo, e
+            );
+            process::exit(1);
+        }
+    };
+    debug!("Loaded rules: {:#?}", rules);
     let mut passing = true;
     for rule in rules {
         match rule.verify(&bundle) {

@@ -23,6 +23,7 @@ pub fn load(path: &str) -> Result<PathBuf, Error> {
     if local_path.exists() {
         fs::remove_dir_all(&local_path)?;
     }
+    debug!("Cloning {} to {}", path, local_path.display());
     Repository::clone(path, &local_path)?;
     Ok(local_path)
 }

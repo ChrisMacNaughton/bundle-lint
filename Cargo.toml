@@ -1,6 +1,6 @@
 [package]
 name = "bundle-lint"
-version = "0.1.5"
+version = "0.1.6"
 license = "Apache2"
 authors = ["Chris MacNaughton <chris@centaurisolutions.nl>"]
 edition = "2018"
