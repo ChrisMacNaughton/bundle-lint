@@ -1,6 +1,6 @@
 name: bundle-lint
 base: core18
-version: '0.1.6'
+version: '0.1.7'
 summary: Linter for juju bundles or deployed models # 79 char long summary
 description: |
   bundle-lint is a simple package that can map configured rules
