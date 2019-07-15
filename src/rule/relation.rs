@@ -34,7 +34,7 @@ pub struct Relation {
 #[derive(Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 pub struct ConfigDetail {
     pub name: String,
-    pub value: String,
+    pub value: serde_yaml::Value,
 }
 
 impl Relation {

@@ -30,7 +30,7 @@ pub struct Application {
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     to: Vec<String>,
     #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
-    options: BTreeMap<String, String>,
+    options: BTreeMap<String, serde_yaml::Value>,
 }
 
 impl Application {
@@ -38,7 +38,7 @@ impl Application {
         Ok(serde_yaml::from_str(&input)?)
     }
 
-    pub fn option(&self, option: &str) -> Option<&String> {
+    pub fn option(&self, option: &str) -> Option<&serde_yaml::Value> {
         self.options.get(option)
     }
 }
