@@ -74,7 +74,7 @@ applications:
         };
         let verification = rule.verify(&bundle);
 
-        assert_eq!(verification, VerificationResult::Fail{reason: "test-thing-2 / conflicts-with-cool-thing has an extra config value, forbids True".into()});
+        assert_eq!(verification, VerificationResult::Fail{reason: "test-thing-2 / conflicts-with-cool-thing has an extra config value, forbids String(\"True\")".into()});
     }
 
     #[test]
@@ -103,7 +103,7 @@ applications:
         };
         let verification = rule.verify(&bundle);
 
-        assert_eq!(verification, VerificationResult::Fail{reason: "test-thing-2 / conflicts-with-cool-thing has an invalid config value (True), forbids True".into()});
+        assert_eq!(verification, VerificationResult::Fail{reason: "test-thing-2 / conflicts-with-cool-thing has an invalid config value (String(\"True\")), forbids String(\"True\")".into()});
     }
 
     #[test]

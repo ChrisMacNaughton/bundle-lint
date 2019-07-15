@@ -59,7 +59,7 @@ impl Config {
                             if v != value {
                                 return VerificationResult::Fail {
                                     reason: format!(
-                                        "{} / {} has an invalid config value ({:#?}), requires {:#?}",
+                                        "{} / {} has an invalid config value ({:?}), requires {:?}",
                                         application, config.name, v, value
                                     ),
                                 };
@@ -89,7 +89,7 @@ impl Config {
                                 if v == value {
                                     return VerificationResult::Fail {
                                         reason: format!(
-                                            "{} / {} has an invalid config value ({:#?}), forbids {:#?}",
+                                            "{} / {} has an invalid config value ({:?}), forbids {:?}",
                                             application, config.name, v, value
                                         ),
                                     };
@@ -98,7 +98,7 @@ impl Config {
                             None => {
                                 return VerificationResult::Fail {
                                     reason: format!(
-                                        "{} / {} has an extra config value, forbids {:#?}",
+                                        "{} / {} has an extra config value, forbids {:?}",
                                         application, config.name, value
                                     ),
                                 }
