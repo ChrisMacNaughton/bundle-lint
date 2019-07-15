@@ -14,7 +14,7 @@ parts:
   bundle-lint:
     plugin: rust
     source: .
-    stage-packages:
+    build-packages:
       - pkg-config
       - libssl-dev
 apps:
