@@ -17,8 +17,6 @@ parts:
     stage-packages:
       - pkg-config
       - libssl-dev
-    stage-snaps:
-    - juju
 apps:
   bundle-lint:
     adapter: none
