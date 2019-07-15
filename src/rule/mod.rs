@@ -42,7 +42,7 @@ applications:
       config_value: 'True'
       requires:
         neutron-openvswitch:
-          name: bridge-mappings
+          - name: bridge-mappings
 "#;
         let rules: Vec<Rule> = serde_yaml::from_str(yaml_s).unwrap();
         assert_eq!(rules[0].charm_name, "neutron-api");
@@ -55,10 +55,10 @@ applications:
             let mut h = HashMap::new();
             h.insert(
                 "test-thing-2".to_string(),
-                ConfigValue {
+                vec![ConfigValue {
                     name: "conflicts-with-cool-thing".to_string(),
                     value: None,
-                },
+                }],
             );
             h
         };
@@ -84,10 +84,10 @@ applications:
             let mut h = HashMap::new();
             h.insert(
                 "test-thing-2".to_string(),
-                ConfigValue {
+                vec![ConfigValue {
                     name: "conflicts-with-cool-thing".to_string(),
                     value: Some("True".into()),
-                },
+                }],
             );
             h
         };
@@ -113,10 +113,10 @@ applications:
             let mut h = HashMap::new();
             h.insert(
                 "test-thing-2".to_string(),
-                ConfigValue {
+                vec![ConfigValue {
                     name: "conflicts-with-cool-thing".to_string(),
                     value: Some("False".into()),
-                },
+                }],
             );
             h
         };
@@ -142,10 +142,10 @@ applications:
             let mut h = HashMap::new();
             h.insert(
                 "test-thing-3".to_string(),
-                ConfigValue {
+                vec![ConfigValue {
                     name: "required-by-cool-thing".to_string(),
                     value: None,
-                },
+                }],
             );
             h
         };
