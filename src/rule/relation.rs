@@ -68,7 +68,7 @@ impl Relation {
 
             if filtered_relations.len() == 0 {
              return VerificationResult::Fail {
-                    reason: format!("Missing a required relation: {:?}", filtered_relations),
+                    reason: format!("Required relation(s) missing: {:?}", filtered_relations),
                 };
             }
         }
@@ -85,7 +85,7 @@ impl Relation {
 
             if filtered_relations.len() > 0 {
                 return VerificationResult::Fail {
-                    reason: format!("Forbidden relation present: {:?}", filtered_relations),
+                    reason: format!("Forbidden relation(s) present: {:?}", filtered_relations),
                 };
             }
         }
