@@ -60,13 +60,15 @@ impl Relation {
 
     fn verify_required(&self, bundle: &Bundle) -> VerificationResult {
         for relation in &self.requires {
-            if !bundle
+            let filtered_relations: Vec<_> = bundle
                 .relations
                 .iter()
-                .any(|b_relation| b_relation.iter().all(|k| relation.contains(k)))
-            {
-                return VerificationResult::Fail {
-                    reason: "Missing a required relation".into(),
+                .filter(|b_relation|b_relation.iter().all(|k| relation.contains(k)))
+                .collect();
+
+            if filtered_relations.len() == 0 {
+             return VerificationResult::Fail {
+                    reason: format!("Missing a required relation: {:?}", filtered_relations),
                 };
             }
         }
@@ -75,13 +77,15 @@ impl Relation {
 
     fn verify_forbids(&self, bundle: &Bundle) -> VerificationResult {
         for relation in &self.forbids {
-            if bundle
+            let filtered_relations: Vec<_> = bundle
                 .relations
                 .iter()
-                .any(|b_relation| b_relation.iter().all(|k| relation.contains(k)))
-            {
+                .filter(|b_relation| b_relation.iter().all(|k| relation.contains(k)))
+                .collect();
+
+            if filtered_relations.len() > 0 {
                 return VerificationResult::Fail {
-                    reason: "Missing a required relation".into(),
+                    reason: format!("Forbidden relation present: {:?}", filtered_relations),
                 };
             }
         }
