@@ -63,11 +63,11 @@ impl Relation {
             let filtered_relations: Vec<_> = bundle
                 .relations
                 .iter()
-                .filter(|b_relation|b_relation.iter().all(|k| relation.contains(k)))
+                .filter(|b_relation| b_relation.iter().all(|k| relation.contains(k)))
                 .collect();
 
-            if filtered_relations.len() == 0 {
-             return VerificationResult::Fail {
+            if filtered_relations.is_empty() {
+                return VerificationResult::Fail {
                     reason: format!("Required relation(s) missing: {:?}", filtered_relations),
                 };
             }
@@ -83,7 +83,7 @@ impl Relation {
                 .filter(|b_relation| b_relation.iter().all(|k| relation.contains(k)))
                 .collect();
 
-            if filtered_relations.len() > 0 {
+            if ! filtered_relations.is_empty() {
                 return VerificationResult::Fail {
                     reason: format!("Forbidden relation(s) present: {:?}", filtered_relations),
                 };
