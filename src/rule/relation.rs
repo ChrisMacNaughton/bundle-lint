@@ -83,7 +83,7 @@ impl Relation {
                 .filter(|b_relation| b_relation.iter().all(|k| relation.contains(k)))
                 .collect();
 
-            if ! filtered_relations.is_empty() {
+            if !filtered_relations.is_empty() {
                 return VerificationResult::Fail {
                     reason: format!("Forbidden relation(s) present: {:?}", filtered_relations),
                 };
